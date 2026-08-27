@@ -1,0 +1,143 @@
+# LangGraph Configuration for Reverse Engineering System
+# ========================================================
+
+# LangSmith Configuration
+# Sign up at https://smith.langchain.com to get your API key
+langsmith:
+  enabled: true
+  # Options: "cloud", "eu_cloud", "self_hosted"
+  deployment: "cloud"
+  endpoints:
+    cloud: "https://api.smith.langchain.com"
+    eu_cloud: "https://eu.api.smith.langchain.com"
+    self_hosted: "http://localhost:8000"
+  # Set via environment: LANGSMITH_API_KEY, ENABLE_LANGSMITH
+  project_name: "codelore"
+  tracing:
+    enabled: true
+    sample_rate: 1.0  # 100% tracing during development
+    # Trace details to capture
+    capture_input: true
+    capture_output: true
+    capture_errors: true
+    # Tags to automatically apply
+    default_tags:
+      - "reverse-engineering"
+      - "migration"
+      - "langgraph"
+
+# Orchestration Layer
+orchestration:
+  max_iterations: 100
+  timeout_seconds: 3600  # 1 hour max per workflow
+  checkpoint_interval: 10  # Save state every 10 nodes
+
+# State Management
+state:
+  backend: "postgres"  # Options: "memory", "postgres", "redis"
+  postgres:
+    host: "localhost"
+    port: 5432
+    database: "langgraph_state"
+    # Set via environment: POSTGRES_USER, POSTGRES_PASSWORD
+
+# Checkpoint Configuration
+checkpoints:
+  enabled: true
+  backend: "postgres"  # Options: "memory", "postgres", "sqlite"
+  retention_days: 30
+  auto_recovery: true
+
+# Human-in-the-Loop
+hitl:
+  enabled: true
+  approval_required_for:
+    - "code_generation"
+    - "schema_migration"
+    - "deployment"
+  timeout_seconds: 86400  # 24 hours for human response
+
+# LLM Configuration
+llm:
+  provider: "anthropic"  # Options: "anthropic", "openai", "azure"
+  model: "claude-sonnet-4"
+  temperature: 0.1  # Low temperature for deterministic code analysis
+  max_tokens: 4096
+  # Set via environment: ANTHROPIC_API_KEY or OPENAI_API_KEY
+
+# Tool Configuration
+tools:
+  static_analysis:
+    enabled: true
+    timeout_seconds: 300
+  rag_pipeline:
+    enabled: true
+    chunk_size: 1000
+    chunk_overlap: 200
+  graph_db:
+    enabled: true
+    query_timeout: 60
+
+# MCP Server Configuration
+# MCP (Model Context Protocol) servers expose tools for AI agents
+mcp_servers:
+  ast-analysis:
+    enabled: true
+    command: "python"
+    args:
+      - "src/mcp_servers/static_analysis/ast_analysis_server.py"
+    description: "AST parsing and static code analysis"
+    tools:
+      - parse_file
+      - extract_entities
+      - get_complexity
+      - list_supported_languages
+
+  rag-pipeline:
+    enabled: false  # Disabled until OpenAI API integration
+    command: "python"
+    args:
+      - "src/mcp_servers/rag_pipeline/rag_mcp_server.py"
+    description: "Code chunking, embeddings, and semantic search"
+    tools:
+      - chunk_document
+      - embed_code
+      - index_codebase
+      - semantic_search
+      - get_collection_stats
+
+  neo4j-graph:
+    enabled: false  # Disabled until Neo4j database integration
+    command: "python"
+    args:
+      - "src/mcp_servers/graph_db/neo4j_mcp_server.py"
+    description: "Dependency graph operations with Neo4j"
+    tools:
+      - create_nodes
+      - create_relationships
+      - query_graph
+      - find_dependencies
+      - find_dependents
+      - shortest_path
+      - detect_cycles
+      - get_graph_metrics
+      - clear_graph
+
+# Performance Optimization
+performance:
+  parallel_execution: true
+  max_concurrent_nodes: 5
+  cache_enabled: true
+  cache_ttl_seconds: 3600
+
+# Security
+security:
+  pii_masking: true
+  secure_mode: true
+  allowed_file_extensions:
+    - ".java"
+    - ".cob"
+    - ".cbl"
+    - ".st"
+    - ".py"
+    - ".sql"

@@ -1,0 +1,82 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CUSTMGMT.
+       AUTHOR. LEGACY-SYSTEM.
+      *
+      * CUSTOMER MANAGEMENT PROGRAM
+      * HANDLES CUSTOMER CRUD OPERATIONS
+      *
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT CUSTOMER-FILE ASSIGN TO "CUSTFILE"
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS CUST-ID
+               FILE STATUS IS WS-FILE-STATUS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  CUSTOMER-FILE.
+       01  CUSTOMER-RECORD.
+           05  CUST-ID            PIC 9(8).
+           05  CUST-NAME          PIC X(50).
+           05  CUST-ADDRESS       PIC X(100).
+           05  CUST-CITY          PIC X(30).
+           05  CUST-STATE         PIC X(2).
+           05  CUST-ZIP           PIC 9(5).
+           05  CUST-PHONE         PIC X(12).
+           05  CUST-EMAIL         PIC X(50).
+           05  CUST-STATUS        PIC X(1).
+           05  CUST-CREATED-DATE  PIC 9(8).
+           05  CUST-BALANCE       PIC 9(9)V99.
+
+       WORKING-STORAGE SECTION.
+       01  WS-FILE-STATUS         PIC XX.
+       01  WS-EOF                 PIC X VALUE 'N'.
+       01  WS-RECORD-COUNT        PIC 9(5) VALUE ZERO.
+       01  WS-TOTAL-BALANCE       PIC 9(11)V99 VALUE ZERO.
+
+       PROCEDURE DIVISION.
+       MAIN-PROCEDURE.
+           PERFORM INITIALIZATION
+           PERFORM PROCESS-CUSTOMERS
+           PERFORM TERMINATION
+           STOP RUN.
+
+       INITIALIZATION.
+           DISPLAY "CUSTOMER MANAGEMENT SYSTEM STARTING..."
+           OPEN I-O CUSTOMER-FILE
+           IF WS-FILE-STATUS NOT = '00'
+               DISPLAY "ERROR OPENING CUSTOMER FILE: " WS-FILE-STATUS
+               STOP RUN
+           END-IF.
+
+       PROCESS-CUSTOMERS.
+           PERFORM UNTIL WS-EOF = 'Y'
+               READ CUSTOMER-FILE NEXT RECORD
+                   AT END
+                       MOVE 'Y' TO WS-EOF
+                   NOT AT END
+                       PERFORM PROCESS-CUSTOMER-RECORD
+               END-READ
+           END-PERFORM.
+
+       PROCESS-CUSTOMER-RECORD.
+           ADD 1 TO WS-RECORD-COUNT
+           IF CUST-STATUS = 'A'
+               ADD CUST-BALANCE TO WS-TOTAL-BALANCE
+               PERFORM DISPLAY-CUSTOMER-INFO
+           END-IF.
+
+       DISPLAY-CUSTOMER-INFO.
+           DISPLAY "CUSTOMER: " CUST-ID " - " CUST-NAME
+           DISPLAY "  BALANCE: $" CUST-BALANCE.
+
+       TERMINATION.
+           CLOSE CUSTOMER-FILE
+           DISPLAY "TOTAL CUSTOMERS PROCESSED: " WS-RECORD-COUNT
+           DISPLAY "TOTAL BALANCE: $" WS-TOTAL-BALANCE
+           DISPLAY "PROGRAM COMPLETE.".
+
+       END PROGRAM CUSTMGMT.

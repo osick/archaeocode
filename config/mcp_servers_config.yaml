@@ -1,0 +1,150 @@
+# MCP Server Configuration
+# ========================
+
+# Static Analysis Tools
+static_analysis:
+  tree_sitter:
+    enabled: true
+    languages:
+      - java
+      - cobol
+      - python
+      - javascript
+      - typescript
+    grammars_path: "./parsers/tree-sitter-grammars"
+
+  universal_ctags:
+    enabled: true
+    config_path: "./config/ctags.conf"
+    languages: "all"
+
+  semgrep:
+    enabled: true
+    rules_path: "./config/semgrep_rules"
+    auto_update_rules: true
+    severity_levels:
+      - "ERROR"
+      - "WARNING"
+      - "INFO"
+
+  sonarqube:
+    enabled: false  # Optional, requires separate setup
+    server_url: "http://localhost:9000"
+    # Set via environment: SONAR_TOKEN
+
+# RAG Pipeline Configuration
+rag_pipeline:
+  vector_store:
+    provider: "qdrant"  # Options: "qdrant", "weaviate", "chroma", "pinecone"
+    qdrant:
+      host: "localhost"
+      port: 6333
+      collection_name: "code_embeddings"
+      distance_metric: "cosine"
+
+  embeddings:
+    provider: "openai"  # Options: "openai", "cohere", "huggingface"
+    model: "text-embedding-3-large"
+    dimensions: 3072
+    batch_size: 100
+
+  document_loaders:
+    - type: "python"
+      extensions: [".py"]
+    - type: "java"
+      extensions: [".java"]
+    - type: "cobol"
+      extensions: [".cob", ".cbl", ".CBL", ".COB"]
+    - type: "text"
+      extensions: [".txt", ".md", ".sql"]
+
+  text_splitter:
+    type: "RecursiveCharacterTextSplitter"
+    chunk_size: 1000
+    chunk_overlap: 200
+    separators: ["\n\n", "\n", " ", ""]
+    function_boundary_aware: true
+
+# Graph Database Configuration
+graph_db:
+  provider: "neo4j"  # Options: "neo4j", "memgraph"
+  neo4j:
+    uri: "bolt://localhost:7687"
+    database: "code_dependency_graph"
+    # Set via environment: NEO4J_USER, NEO4J_PASSWORD
+
+  memgraph:
+    host: "localhost"
+    port: 7687
+    # Set via environment: MEMGRAPH_USER, MEMGRAPH_PASSWORD
+
+  schema:
+    node_types:
+      - "Class"
+      - "Method"
+      - "Function"
+      - "Module"
+      - "Package"
+      - "Database"
+      - "Table"
+    relationship_types:
+      - "CALLS"
+      - "IMPORTS"
+      - "EXTENDS"
+      - "IMPLEMENTS"
+      - "DEPENDS_ON"
+      - "REFERENCES"
+      - "ACCESSES"
+
+# Language-Specific Parsers (SLAB - Source Language Abstraction Layer)
+slab:
+  cobol:
+    parser: "tree-sitter-cobol"
+    extensions:
+      nonstop:
+        enabled: true
+        tmf_support: true
+        pathway_support: true
+        enscribe_support: true
+        tal_integration: true
+
+  smalltalk:
+    parser: "tree-sitter-smalltalk"
+    image_extractor:
+      enabled: true
+      supported_vendors:
+        - "cincom_visualworks"
+        - "pharo"
+        - "squeak"
+    type_inference:
+      enabled: true
+      strategy: "heuristic"  # Options: "heuristic", "ml_based"
+
+  java:
+    parser: "tree-sitter-java"
+    version: "17"  # Target Java version
+    spring_boot_support: true
+
+  python:
+    parser: "tree-sitter-python"
+    version: "3.11"
+
+# Data Processing Configuration
+data_processing:
+  chunking:
+    strategy: "function_aware"  # Options: "fixed", "semantic", "function_aware"
+    max_chunk_size: 2000
+
+  metadata_extraction:
+    enabled: true
+    extract:
+      - "author"
+      - "last_modified"
+      - "file_path"
+      - "language"
+      - "complexity_score"
+      - "dependencies"
+
+  indexing:
+    batch_size: 100
+    parallel_workers: 4

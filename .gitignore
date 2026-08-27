@@ -1,0 +1,117 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Data directories
+data/vector_store/*
+!data/vector_store/.gitkeep
+data/graph_db/*
+!data/graph_db/.gitkeep
+data/metadata/*
+!data/metadata/.gitkeep
+
+# Logs
+*.log
+logs/
+*.out
+
+# Test coverage
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Documentation builds
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# Tree-sitter compiled grammars
+parsers/tree-sitter-grammars/*.so
+parsers/tree-sitter-grammars/*.dylib
+parsers/tree-sitter-grammars/*.dll
+
+# Custom tree-sitter grammars (cloned from GitHub, can be rebuilt)
+grammars/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# LangSmith local cache
+.langsmith/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff
+.ruff_cache/
+
+# Generated files
+generated/
+output/
+
+# Docker volumes
+.docker-data/
+
+# Generated tool artifacts (do not commit)
+.repo-ctx/
+.claude/
+.vibe/
+workflow_report.json
