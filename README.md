@@ -1,17 +1,17 @@
-# codelore
+# archaeocode
 
-[![CI](https://github.com/osick/codelore/actions/workflows/ci.yml/badge.svg)](https://github.com/osick/codelore/actions/workflows/ci.yml)
+[![CI](https://github.com/osick/archaeocode/actions/workflows/ci.yml/badge.svg)](https://github.com/osick/archaeocode/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-**Excavate the lore buried in your legacy code.** Point codelore at a legacy codebase — get back business-readable user stories, a dependency map, and structural analysis.
+**Automated software archaeology.** Point archaeocode at a legacy codebase — get back business-readable user stories, a dependency map, and structural analysis: the raw material for a migration backlog, excavated from code whose authors are long gone.
 
 Most reverse-engineering tools stop at syntax: they parse code and draw diagrams. This project goes one step further and recovers the *business intent* hidden in legacy code. An AI agent workflow (LangGraph) orchestrates static-analysis tools (exposed as MCP servers) to turn COBOL, Smalltalk, Fortran, Pascal, or Java code into artifacts that stakeholders can actually read — the raw material for a migration backlog.
 
 ## What makes it different
 
 - **User stories from code** — the unique feature: an LLM analyzes each source file and produces user stories with roles, capabilities, benefits, acceptance criteria, priority, and confidence scores. Legacy knowledge becomes a product backlog.
-- **Legacy-first language support** — COBOL, Fortran, Pascal, and Smalltalk (including a Cincom/VisualWorks variant with custom tree-sitter grammars), alongside Java, Python, JavaScript, and TypeScript.
+- **Legacy-first language support** — COBOL, Fortran, Pascal, and Smalltalk alongside Java, Python, JavaScript, and TypeScript. See the [language matrix](#language-support) for per-language capabilities.
 - **MCP architecture** — analysis tools (AST parsing, dependency graphs, RAG) are [Model Context Protocol](https://modelcontextprotocol.io/) servers, so any MCP-capable agent can reuse them independently of this workflow.
 - **Observable by design** — every workflow run can be traced in [LangSmith](https://docs.smith.langchain.com) (token costs, latency, state snapshots).
 
@@ -31,9 +31,12 @@ Each analysis step is an MCP server under `src/mcp_servers/` (static analysis, g
 ## Quick start
 
 ```bash
-git clone https://github.com/osick/codelore.git
-cd codelore
+git clone https://github.com/osick/archaeocode.git
+cd archaeocode
 pip install -r requirements.txt
+
+# Optional: install the `archaeo` command onto your PATH
+pip install -e .
 
 # Optional but recommended: enable user-story extraction
 cp .env.example .env   # add your ANTHROPIC_API_KEY (or OPENAI_API_KEY)
@@ -43,11 +46,13 @@ Run the workflow against the bundled samples:
 
 ```bash
 # COBOL analysis
-python reverse --source sample_data/cobol --source-lang cobol --target-lang java
+python archaeo --source sample_data/cobol --source-lang cobol --target-lang java
 
 # Java (Spring) analysis with report
-python reverse --source sample_data/java --source-lang java --target-lang python --report report.json
+python archaeo --source sample_data/java --source-lang java --target-lang python --report report.json
 ```
+
+![archaeo analyzing the bundled COBOL sample](docs/assets/archaeo-demo.svg)
 
 You get a console summary plus a JSON report: file catalog, language breakdown, dependency edges/cycles/layers, and (with an API key) generated user stories.
 
@@ -92,21 +97,26 @@ A complete runnable example is in [`examples/user_story_extraction/basic_usage.p
 - An Anthropic or OpenAI API key for user-story extraction (everything else runs without one)
 - Optional: Neo4j 5.x if you want persistent dependency graphs, LangSmith account for tracing
 
-## Smalltalk support
+## Language support
 
-Standard and Cincom/VisualWorks Smalltalk are parsed with custom tree-sitter grammars:
+| Language | Discovery & catalog | Dependency map | User stories | AST parsing (tree-sitter) |
+|---|:---:|:---:|:---:|:---:|
+| COBOL | ✅ | ✅ | ✅ | 🎯 planned |
+| Fortran | ✅ | ✅ | ✅ | 🎯 planned |
+| Pascal | ✅ | ✅ | ✅ | 🎯 planned |
+| Smalltalk (standard + Cincom) | ✅ | ✅ | ✅ | ✅ ¹ |
+| Java | ✅ | ✅ | ✅ | ✅ |
+| Python | ✅ | ✅ | ✅ | ✅ |
+| JavaScript / TypeScript | ✅ | ✅ | ✅ | ✅ |
 
-```bash
-python scripts/build_smalltalk_grammar.py
-python reverse --source sample_data/smalltalk --source-lang smalltalk --target-lang java
-```
+The AST MCP server additionally parses C, C++, C#, Go, Rust, Ruby, PHP, and Bash. Every language ships with a sample under [`sample_data/`](sample_data/) so you can try it immediately.
 
-See [docs/SMALLTALK_SUPPORT.md](docs/SMALLTALK_SUPPORT.md) and [docs/SMALLTALK_VARIANTS.md](docs/SMALLTALK_VARIANTS.md).
+¹ Smalltalk uses custom tree-sitter grammars — build them once with `python scripts/build_smalltalk_grammar.py` (details: [SMALLTALK_SUPPORT](docs/SMALLTALK_SUPPORT.md), [SMALLTALK_VARIANTS](docs/SMALLTALK_VARIANTS.md)).
 
 ## Project structure
 
 ```
-├── reverse                     # CLI entry point
+├── archaeo                     # CLI entry point
 ├── src/
 │   ├── orchestration/          # LangGraph workflow
 │   │   ├── graph.py            # Direct workflow (in-process nodes)
@@ -151,3 +161,5 @@ Issues and pull requests are welcome. Please run `pytest` before submitting, and
 ## License
 
 [MIT](LICENSE) © 2026 Oliver Sick
+
+The bundled [Spring PetClinic sample](sample_data/spring-petclinic/) is third-party code from [spring-projects/spring-petclinic](https://github.com/spring-projects/spring-petclinic), redistributed under its own [Apache License 2.0](sample_data/spring-petclinic/LICENSE).

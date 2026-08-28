@@ -36,7 +36,7 @@ def _setup_langsmith_tracing():
             os.environ["LANGCHAIN_TRACING_V2"] = "true"
             os.environ["LANGCHAIN_PROJECT"] = os.getenv(
                 "LANGSMITH_PROJECT",
-                "agentic-reverse-engineering"
+                "archaeocode"
             )
             os.environ["LANGCHAIN_ENDPOINT"] = os.getenv(
                 "LANGSMITH_ENDPOINT",

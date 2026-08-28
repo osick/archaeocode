@@ -512,7 +512,11 @@ class ASTAnalysisNode:
 
         total_entities = sum(len(v) for v in parsed_entities.values())
 
-        print(f"✅ Parsed {parsed_count} files ({skipped_count} unsupported)")
-        print(f"📊 Found: {total_entities} entities ({len(parsed_entities['classes'])} classes, {len(parsed_entities['functions'])} functions)")
+        if parsed_count > 0:
+            print(f"✅ Parsed {parsed_count} files ({skipped_count} unsupported)")
+            print(f"📊 Found: {total_entities} entities ({len(parsed_entities['classes'])} classes, {len(parsed_entities['functions'])} functions)")
+        else:
+            print(f"⚠️  No tree-sitter grammar for this language yet — AST parsing skipped for {skipped_count} files")
+            print(f"   (discovery, dependency mapping, and user stories still run)")
 
         return state

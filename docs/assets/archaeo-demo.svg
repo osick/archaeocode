@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="902" viewBox="0 0 780 902" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace">
+  <style>.t { font-size: 12.5px; white-space: pre; }</style>
+  <rect width="780" height="902" rx="10" fill="#0d1117" stroke="#30363d"/>
+  <rect width="780" height="32" rx="10" fill="#161b22"/>
+  <rect y="22" width="780" height="10" fill="#161b22"/>
+  <circle cx="22" cy="16" r="6" fill="#ff5f57"/>
+  <circle cx="42" cy="16" r="6" fill="#febc2e"/>
+  <circle cx="62" cy="16" r="6" fill="#28c840"/>
+  <text x="390" y="20" text-anchor="middle" fill="#8b949e" font-size="12">archaeo</text>
+  <text x="22" y="66" class="t" xml:space="preserve"><tspan fill="#3fb950">$ </tspan><tspan fill="#e6edf3">./archaeo --source sample_data/cobol --source-lang cobol --target-lang java</tspan></text>
+<text x="22" y="104" class="t" xml:space="preserve"><tspan fill="#e6edf3">🔧 Initializing LangGraph workflow...</tspan></text>
+<text x="22" y="142" class="t" xml:space="preserve"><tspan fill="#8b949e">  Initialized tree-sitter parsers for 14 languages</tspan></text>
+<text x="22" y="161" class="t" xml:space="preserve"><tspan fill="#e6edf3">🚀 Starting migration workflow: eb776131-e77e-471d-b73b-5bc719b5cd85</tspan></text>
+<text x="22" y="180" class="t" xml:space="preserve"><tspan fill="#8b949e">   Source: cobol -&gt; Target: java</tspan></text>
+<text x="22" y="199" class="t" xml:space="preserve"><tspan fill="#8b949e">   Path: sample_data/cobol</tspan></text>
+<text x="22" y="237" class="t" xml:space="preserve"><tspan fill="#e6edf3">🔍 Discovering code in: sample_data/cobol</tspan></text>
+<text x="22" y="256" class="t" xml:space="preserve"><tspan fill="#3fb950">✅ Discovered 2 files (104 lines)</tspan></text>
+<text x="22" y="275" class="t" xml:space="preserve"><tspan fill="#e6edf3">📊 Language breakdown: {'cobol': 2}</tspan></text>
+<text x="22" y="294" class="t" xml:space="preserve"><tspan fill="#3fb950">✓ Completed: discovery</tspan></text>
+<text x="22" y="332" class="t" xml:space="preserve"><tspan fill="#e6edf3">🌳 Analyzing AST for 2 files...</tspan></text>
+<text x="22" y="351" class="t" xml:space="preserve"><tspan fill="#d29922">⚠️  No tree-sitter grammar for this language yet — AST parsing skipped for 2 files</tspan></text>
+<text x="22" y="370" class="t" xml:space="preserve"><tspan fill="#8b949e">   (discovery, dependency mapping, and user stories still run)</tspan></text>
+<text x="22" y="389" class="t" xml:space="preserve"><tspan fill="#3fb950">✓ Completed: ast_analysis</tspan></text>
+<text x="22" y="427" class="t" xml:space="preserve"><tspan fill="#e6edf3">🔗 Mapping dependencies...</tspan></text>
+<text x="22" y="446" class="t" xml:space="preserve"><tspan fill="#8b949e">  Found 4 dependency edges</tspan></text>
+<text x="22" y="465" class="t" xml:space="preserve"><tspan fill="#e6edf3">📊 Dependency layers: 2</tspan></text>
+<text x="22" y="484" class="t" xml:space="preserve"><tspan fill="#8b949e">    Layer 0: 2 nodes</tspan></text>
+<text x="22" y="503" class="t" xml:space="preserve"><tspan fill="#8b949e">    Layer 1: 2 nodes</tspan></text>
+<text x="22" y="522" class="t" xml:space="preserve"><tspan fill="#3fb950">✓ Completed: dependency_mapping</tspan></text>
+<text x="22" y="579" class="t" xml:space="preserve"><tspan fill="#e6edf3">📖 Extracting user stories from code...</tspan></text>
+<text x="22" y="598" class="t" xml:space="preserve"><tspan fill="#8b949e">  Analyzing 2 code files...</tspan></text>
+<text x="22" y="617" class="t" xml:space="preserve"><tspan fill="#8b949e">  [1/2] Analyzing sample_data/cobol/PAYMENT.cob...</tspan></text>
+<text x="22" y="636" class="t" xml:space="preserve"><tspan fill="#3fb950">    ✓ Generated story: Customer Payment Processing and Validation</tspan></text>
+<text x="22" y="655" class="t" xml:space="preserve"><tspan fill="#8b949e">  [2/2] Analyzing sample_data/cobol/CUSTMGMT.cob...</tspan></text>
+<text x="22" y="674" class="t" xml:space="preserve"><tspan fill="#3fb950">    ✓ Generated story: Customer Record Management System</tspan></text>
+<text x="22" y="712" class="t" xml:space="preserve"><tspan fill="#3fb950">✅ Generated 2 user stories</tspan></text>
+<text x="22" y="750" class="t" xml:space="preserve"><tspan fill="#e6edf3">📋 User Stories Generated:</tspan></text>
+<text x="22" y="769" class="t" xml:space="preserve"><tspan fill="#8b949e">  1. Customer Payment Processing and Validation (High priority, 5 points)</tspan></text>
+<text x="22" y="788" class="t" xml:space="preserve"><tspan fill="#8b949e">  2. Customer Record Management System (High priority, 5 points)</tspan></text>
+<text x="22" y="807" class="t" xml:space="preserve"><tspan fill="#3fb950">✓ Completed: user_story_extraction</tspan></text>
+<text x="22" y="845" class="t" xml:space="preserve"><tspan fill="#6e7681">⋮</tspan></text>
+<text x="22" y="883" class="t" xml:space="preserve"><tspan fill="#e6edf3">📄 Report saved to: workflow_report.json</tspan></text>
+</svg>

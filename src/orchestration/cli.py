@@ -1,13 +1,12 @@
-#!/usr/bin/env python3
 """
-Reverse Engineering Workflow CLI
-=================================
+archaeocode CLI
+===============
 
-Entry point for running the LangGraph migration workflow.
+Entry point for running the archaeocode analysis workflow.
 
 Usage:
-    python run_workflow.py --source ./sample_data --source-lang cobol --target-lang java
-    python run_workflow.py --source ./legacy_code --source-lang smalltalk --target-lang kotlin
+    archaeo --source ./sample_data --source-lang cobol --target-lang java
+    archaeo --source ./legacy_code --source-lang smalltalk --target-lang kotlin
 """
 
 import argparse
@@ -16,16 +15,13 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-# Add src to Python path
-sys.path.insert(0, str(Path(__file__).parent))
-
 from src.orchestration.graph import create_graph
 
 
 def parse_args():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(
-        description="Run reverse engineering and migration workflow"
+        description="Excavate user stories and dependency maps from legacy code"
     )
 
     parser.add_argument(

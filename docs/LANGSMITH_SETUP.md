@@ -46,28 +46,28 @@ Add these lines to `.env`:
 # LangSmith Configuration
 ENABLE_LANGSMITH=true
 LANGSMITH_API_KEY=lsv2_pt_your_api_key_here
-LANGSMITH_PROJECT=codelore
+LANGSMITH_PROJECT=archaeocode
 LANGSMITH_ENDPOINT=https://api.smith.langchain.com
 ```
 
 ### 4. Run Your Workflow
 
 ```bash
-python reverse --source ./sample_data --source-lang cobol --target-lang java
+python archaeo --source ./sample_data --source-lang cobol --target-lang java
 ```
 
 You should see:
 
 ```
 ✅ LangSmith tracing enabled
-   Project: codelore
+   Project: archaeocode
    Endpoint: https://api.smith.langchain.com
 ```
 
 ### 5. View Traces in LangSmith
 
 1. Open [https://smith.langchain.com](https://smith.langchain.com)
-2. Navigate to your project: `codelore`
+2. Navigate to your project: `archaeocode`
 3. Click on a trace to see detailed execution flow
 
 ## Configuration Options
@@ -78,7 +78,7 @@ You should see:
 |----------|-------------|---------|----------|
 | `ENABLE_LANGSMITH` | Enable/disable tracing | `false` | No |
 | `LANGSMITH_API_KEY` | Your LangSmith API key | - | Yes |
-| `LANGSMITH_PROJECT` | Project name in LangSmith | `codelore` | No |
+| `LANGSMITH_PROJECT` | Project name in LangSmith | `archaeocode` | No |
 | `LANGSMITH_ENDPOINT` | LangSmith API endpoint | `https://api.smith.langchain.com` | No |
 
 ### YAML Configuration
@@ -89,7 +89,7 @@ Edit `config/langgraph_config.yaml`:
 langsmith:
   enabled: true
   deployment: "cloud"  # Options: "cloud", "eu_cloud", "self_hosted"
-  project_name: "codelore"
+  project_name: "archaeocode"
   tracing:
     enabled: true
     sample_rate: 1.0  # 100% of runs
@@ -434,4 +434,4 @@ langsmith:
 
 ---
 
-**Questions?** See our [GitHub Discussions](https://github.com/osick/codelore/discussions)
+**Questions?** See our [GitHub Discussions](https://github.com/osick/archaeocode/discussions)

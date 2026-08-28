@@ -33,4 +33,4 @@ jobs:
         run: pytest tests/ -v
 
       - name: Smoke-test the CLI
-        run: python reverse --source sample_data/python --source-lang python --target-lang java --report /tmp/smoke_report.json
+        run: python archaeo --source sample_data/python --source-lang python --target-lang java --report /tmp/smoke_report.json

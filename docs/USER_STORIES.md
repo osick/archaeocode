@@ -51,7 +51,7 @@ OPENAI_API_KEY=sk-your-actual-key-here
 ### Step 3: Run Workflow
 
 ```bash
-python reverse --source ./sample_data --source-lang cobol --target-lang java
+python archaeo --source ./sample_data --source-lang cobol --target-lang java
 ```
 
 ## 📖 Example Output
@@ -159,7 +159,7 @@ artifacts_to_analyze = state["code_artifacts"][:10]  # Analyze first 10 files
 **Solution**: Extract user stories to recover business requirements.
 
 ```bash
-python reverse --source ./legacy_cobol --source-lang cobol --target-lang java
+python archaeo --source ./legacy_cobol --source-lang cobol --target-lang java
 ```
 
 ### 2. Migration Planning
@@ -169,7 +169,7 @@ python reverse --source ./legacy_cobol --source-lang cobol --target-lang java
 **Solution**: User stories provide complexity estimates for planning.
 
 ```bash
-python reverse --source ./old_system --source-lang cobol --target-lang java --report migration_plan.json
+python archaeo --source ./old_system --source-lang cobol --target-lang java --report migration_plan.json
 ```
 
 ### 3. Stakeholder Communication
@@ -179,7 +179,7 @@ python reverse --source ./old_system --source-lang cobol --target-lang java --re
 **Solution**: Show them user stories in plain language.
 
 ```bash
-python reverse --source ./codebase --source-lang java --target-lang kotlin
+python archaeo --source ./codebase --source-lang java --target-lang kotlin
 # Share workflow_report.json with stakeholders
 ```
 
@@ -210,7 +210,7 @@ If you have business documentation, include it in a README:
 
 ```bash
 echo "This is a payment processing system for retail banking" > ./codebase/README.md
-python reverse --source ./codebase --source-lang cobol --target-lang java
+python archaeo --source ./codebase --source-lang cobol --target-lang java
 ```
 
 ### 4. Use Descriptive Variable Names
@@ -330,7 +330,7 @@ Key findings:
 ## 🆘 Need Help?
 
 1. Check `.env` file has valid API key
-2. Try with sample data first: `python reverse --source ./sample_data`
+2. Try with sample data first: `python archaeo --source ./sample_data`
 3. Review the logs for specific error messages
 4. Check API key has sufficient credits
 

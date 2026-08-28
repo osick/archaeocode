@@ -1,8 +1,8 @@
 # Changelog
 
-## [0.2.0] - 2026-08-27
+## [0.3.0] - 2026-08-27
 
-First public release, under the new name **codelore** (previously `agentic-reverse-engineering`).
+First public release, under the new name **archaeocode** (previously `agentic-reverse-engineering`).
 
 ### Fixed
 - **Package shadowing**: renamed the internal `src/langgraph/` package to `src/orchestration/` — the old name shadowed the installed `langgraph` library and broke the test suite with circular imports.
@@ -25,6 +25,7 @@ First public release, under the new name **codelore** (previously `agentic-rever
 - MIT `LICENSE`.
 - GitHub Actions CI: pytest on Python 3.10–3.12 plus a CLI smoke test.
 - Working example in `examples/user_story_extraction/basic_usage.py`.
+- CLI renamed from `reverse` to `archaeo`, now also installable as a console command via `pip install .`.
 
 ## [0.1] - 2025-11-07
 

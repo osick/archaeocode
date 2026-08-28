@@ -5,8 +5,8 @@ Get from clone to your first analysis in about five minutes.
 ## 1. Install
 
 ```bash
-git clone https://github.com/osick/codelore.git
-cd codelore
+git clone https://github.com/osick/archaeocode.git
+cd archaeocode
 pip install -r requirements.txt
 ```
 
@@ -23,14 +23,14 @@ Without an API key the workflow still runs discovery, AST analysis, and dependen
 
 ```bash
 # Analyze the bundled COBOL samples
-python reverse --source sample_data/cobol --source-lang cobol --target-lang java
+python archaeo --source sample_data/cobol --source-lang cobol --target-lang java
 
 # Java, with a custom report path and verbose output
-python reverse --source sample_data/java --source-lang java --target-lang python \
+python archaeo --source sample_data/java --source-lang java --target-lang python \
     --report report.json --verbose
 
 # Any codebase of yours
-python reverse --source /path/to/legacy/code --source-lang cobol --target-lang java
+python archaeo --source /path/to/legacy/code --source-lang cobol --target-lang java
 ```
 
 Supported source languages: `cobol`, `smalltalk`, `java`, `python`, `javascript`, `fortran`, `pascal`.
@@ -56,7 +56,7 @@ python -m json.tool workflow_report.json
 ```bash
 echo "ENABLE_LANGSMITH=true" >> .env
 echo "LANGSMITH_API_KEY=lsv2_pt_..." >> .env
-echo "LANGSMITH_PROJECT=codelore" >> .env
+echo "LANGSMITH_PROJECT=archaeocode" >> .env
 ```
 Then view traces at https://smith.langchain.com. Details: [docs/LANGSMITH_SETUP.md](docs/LANGSMITH_SETUP.md)
 

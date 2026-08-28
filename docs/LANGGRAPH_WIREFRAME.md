@@ -76,7 +76,7 @@ This document describes the LangGraph implementation structure for the reverse e
 ## Directory Structure
 
 ```
-codelore/
+archaeocode/
 │
 ├── src/                           # Main source code (Python package)
 │   ├── __init__.py

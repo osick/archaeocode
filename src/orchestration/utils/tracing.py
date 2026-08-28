@@ -17,7 +17,7 @@ def is_tracing_enabled() -> bool:
 
 def get_project_name() -> str:
     """Get the current LangSmith project name"""
-    return os.getenv("LANGCHAIN_PROJECT", "agentic-reverse-engineering")
+    return os.getenv("LANGCHAIN_PROJECT", "archaeocode")
 
 
 def add_node_metadata(node_name: str, metadata: Dict[str, Any]) -> Dict[str, Any]:

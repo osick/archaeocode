@@ -570,19 +570,19 @@ Edit: `%APPDATA%\Claude\claude_desktop_config.json`
     "ast-analysis": {
       "command": "python",
       "args": [
-        "/path/to/codelore/src/mcp_servers/static_analysis/ast_analysis_server.py"
+        "/path/to/archaeocode/src/mcp_servers/static_analysis/ast_analysis_server.py"
       ]
     },
     "rag-pipeline": {
       "command": "python",
       "args": [
-        "/path/to/codelore/src/mcp_servers/rag_pipeline/rag_mcp_server.py"
+        "/path/to/archaeocode/src/mcp_servers/rag_pipeline/rag_mcp_server.py"
       ]
     },
     "neo4j-graph": {
       "command": "python",
       "args": [
-        "/path/to/codelore/src/mcp_servers/graph_db/neo4j_mcp_server.py"
+        "/path/to/archaeocode/src/mcp_servers/graph_db/neo4j_mcp_server.py"
       ]
     }
   }

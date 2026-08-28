@@ -306,5 +306,5 @@
 ---
 
 **Last Updated**: 2025-11-02
-**Maintained By**: codelore project
+**Maintained By**: archaeocode project
 **Related Documents**: See LANGGRAPH_WIREFRAME.md

@@ -140,8 +140,8 @@ Or download binary from: https://github.com/qdrant/qdrant/releases
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/your-org/codelore.git
-cd codelore
+git clone https://github.com/your-org/archaeocode.git
+cd archaeocode
 ```
 
 ### 2. Create Virtual Environment
@@ -437,8 +437,8 @@ pip install tree-sitter-languages
 
 ## Support
 
-- **Issues**: https://github.com/your-org/codelore/issues
-- **Discussions**: https://github.com/your-org/codelore/discussions
+- **Issues**: https://github.com/your-org/archaeocode/issues
+- **Discussions**: https://github.com/your-org/archaeocode/discussions
 - **Documentation**: https://your-docs-site.com
 
 ---
