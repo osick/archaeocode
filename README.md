@@ -12,7 +12,8 @@ Most reverse-engineering tools stop at syntax: they parse code and draw diagrams
 
 - **User stories from code** — the unique feature: an LLM analyzes each source file and produces user stories with roles, capabilities, benefits, acceptance criteria, priority, and confidence scores. Legacy knowledge becomes a product backlog.
 - **Legacy-first language support** — COBOL, Fortran, Pascal, and Smalltalk alongside Java, Python, JavaScript, and TypeScript. See the [language matrix](#language-support) for per-language capabilities.
-- **MCP architecture** — analysis tools (AST parsing, dependency graphs, RAG) are [Model Context Protocol](https://modelcontextprotocol.io/) servers, so any MCP-capable agent can reuse them independently of this workflow.
+- **Knowledge management built in** — every run can be persisted into a [GraphRAG knowledge base](docs/KNOWLEDGE_MANAGEMENT.md) (powered by [LightRAG](https://github.com/HKUDS/LightRAG)): files, entities, dependency edges and user stories become a queryable knowledge graph, exportable as an Obsidian-style wiki. Ask it questions with `archaeo-kb` or from any agent via MCP. Runs on local files or on Neo4j / Postgres / Qdrant for large estates.
+- **MCP architecture** — analysis tools (AST parsing, dependency graphs, RAG, knowledge base) are [Model Context Protocol](https://modelcontextprotocol.io/) servers, so any MCP-capable agent can reuse them independently of this workflow.
 - **Observable by design** — every workflow run can be traced in [LangSmith](https://docs.smith.langchain.com) (token costs, latency, state snapshots).
 
 ## How it works
@@ -20,13 +21,13 @@ Most reverse-engineering tools stop at syntax: they parse code and draw diagrams
 ```
 LangGraph Orchestration
     │
-[Discovery] ──► [AST Analysis] ──► [Dependency Mapping] ──► [User Stories]
-    │                │                     │                     │
-file catalog    tree-sitter          graph + cycle          Claude / GPT
-                  parsing              detection
+[Discovery] ──► [AST Analysis] ──► [Dependency Mapping] ──► [User Stories] ──► [Knowledge Base]
+    │                │                     │                     │                   │
+file catalog    tree-sitter          graph + cycle          Claude / GPT      LightRAG GraphRAG
+                  parsing              detection                              (optional, --knowledge-base)
 ```
 
-Each analysis step is an MCP server under `src/mcp_servers/` (static analysis, graph DB, RAG pipeline); the LangGraph workflow under `src/orchestration/` wires them together with checkpointing and state management.
+Each analysis step is an MCP server under `src/mcp_servers/` (static analysis, graph DB, RAG pipeline, knowledge base); the LangGraph workflow under `src/orchestration/` wires them together with checkpointing and state management.
 
 ## Quick start
 
@@ -55,6 +56,20 @@ python archaeo --source sample_data/java --source-lang java --target-lang python
 ![archaeo analyzing the bundled COBOL sample](docs/assets/archaeo-demo.svg)
 
 You get a console summary plus a JSON report: file catalog, language breakdown, dependency edges/cycles/layers, and (with an API key) generated user stories.
+
+Keep the knowledge instead of just reporting it:
+
+```bash
+# persist the run into the knowledge base (+ an Obsidian-compatible wiki)
+python archaeo --source sample_data/cobol --source-lang cobol --knowledge-base --kb-wiki ./wiki
+
+# then ask it questions (query needs an LLM key; retrieve/graph/stats do not)
+archaeo-kb query "Which programs touch the customer master file?"
+archaeo-kb retrieve "PAYMENT" --mode local
+archaeo-kb graph "PAYMENT.cob"
+```
+
+See [docs/KNOWLEDGE_MANAGEMENT.md](docs/KNOWLEDGE_MANAGEMENT.md) for the design decision (GraphRAG via LightRAG), query modes, and how to scale it to Neo4j / Postgres / Qdrant.
 
 Or use it from Python:
 
@@ -86,8 +101,11 @@ A complete runnable example is in [`examples/user_story_extraction/basic_usage.p
 | LangSmith tracing | ✅ working |
 | Checkpointing / resumable workflows | ✅ working |
 | Smalltalk grammars (standard + Cincom) | ✅ working (grammar build required, see below) |
-| RAG semantic code search (MCP server) | 🚧 functional, not yet wired into the workflow |
-| Neo4j-backed dependency graphs | 🚧 in-memory fallback works; live Neo4j optional |
+| Knowledge base: GraphRAG over files, entities, dependencies, stories (LightRAG, MCP server, `archaeo-kb`) | ✅ working (opt-in per run) |
+| Knowledge base: LLM extraction of business entities | ✅ working (`--kb-extract`, needs API key) |
+| Knowledge base: Obsidian-compatible wiki export | ✅ working |
+| RAG semantic code search (MCP server) | 🚧 mock; superseded by the knowledge base |
+| Neo4j-backed dependency graphs | 🚧 in-memory fallback works; live Neo4j optional (the knowledge base can use Neo4j today) |
 | Code generation to target language | 🎯 planned |
 | HP NonStop COBOL extensions (TMF, Pathway) | 🎯 planned |
 
@@ -95,7 +113,7 @@ A complete runnable example is in [`examples/user_story_extraction/basic_usage.p
 
 - Python 3.10+
 - An Anthropic or OpenAI API key for user-story extraction (everything else runs without one)
-- Optional: Neo4j 5.x if you want persistent dependency graphs, LangSmith account for tracing
+- Optional: Neo4j 5.x / PostgreSQL+pgvector / Qdrant to scale the knowledge base beyond local files, LangSmith account for tracing
 
 ## Language support
 
@@ -116,18 +134,20 @@ The AST MCP server additionally parses C, C++, C#, Go, Rust, Ruby, PHP, and Bash
 ## Project structure
 
 ```
-├── archaeo                     # CLI entry point
+├── archaeo                     # CLI entry point (archaeo-kb: knowledge base CLI)
 ├── src/
 │   ├── orchestration/          # LangGraph workflow
 │   │   ├── graph.py            # Direct workflow (in-process nodes)
 │   │   ├── graph_mcp.py        # MCP-backed workflow
-│   │   ├── nodes/              # Discovery, AST, dependency, user-story nodes
+│   │   ├── kb_cli.py           # archaeo-kb: query the knowledge base
+│   │   ├── nodes/              # Discovery, AST, dependency, user-story, knowledge-base nodes
 │   │   ├── state/              # Workflow state schema
 │   │   └── utils/              # MCP client, LangSmith tracing
 │   ├── mcp_servers/
 │   │   ├── static_analysis/    # tree-sitter AST analysis + custom grammars
 │   │   ├── graph_db/           # dependency graph (Neo4j / in-memory)
-│   │   └── rag_pipeline/       # chunking, embeddings, semantic search
+│   │   ├── rag_pipeline/       # chunking, embeddings, semantic search
+│   │   └── knowledge_base/     # GraphRAG knowledge base (LightRAG adapter + MCP server)
 │   └── parsers/                # language-specific parser extensions
 ├── config/                     # workflow + MCP server configuration
 ├── sample_data/                # COBOL, Java, Smalltalk, Fortran, Pascal, Python samples
@@ -152,6 +172,7 @@ The suite runs in [GitHub Actions](.github/workflows/ci.yml) on Python 3.10–3.
 - [MCP server architecture](docs/MCP_ARCHITECTURE.md) and [usage](docs/MCP_SERVERS_USAGE.md)
 - [LangSmith setup](docs/LANGSMITH_SETUP.md)
 - [User story extraction](docs/USER_STORIES.md)
+- [Knowledge management (GraphRAG knowledge base)](docs/KNOWLEDGE_MANAGEMENT.md)
 - [Roadmap](docs/ROADMAP.md) · [Changelog](docs/CHANGELOG.md)
 
 ## Contributing

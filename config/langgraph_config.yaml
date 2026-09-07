@@ -78,6 +78,45 @@ tools:
     enabled: true
     query_timeout: 60
 
+# Knowledge Base (knowledge management)
+# --------------------------------------
+# Persists every run's findings (files, AST entities, dependency graph, user
+# stories) into a GraphRAG store powered by LightRAG (https://github.com/HKUDS/LightRAG).
+# Opt-in per run: `archaeo --knowledge-base` or `enabled: true` here.
+# Environment variables KB_* override these values; see .env.example.
+knowledge_base:
+  enabled: false
+  working_dir: "data/knowledge_base"
+  workspace: ""                 # one workspace per analyzed system on shared back-ends
+  # Storage — file-based defaults need no infrastructure; swap for scale:
+  #   graph_storage:  NetworkXStorage | Neo4JStorage | PGGraphStorage | MemgraphStorage | MongoGraphStorage
+  #   vector_storage: NanoVectorDBStorage | PGVectorStorage | QdrantVectorDBStorage | MilvusVectorDBStorage | FaissVectorDBStorage
+  #   kv_storage:     JsonKVStorage | PGKVStorage | RedisKVStorage | MongoKVStorage
+  graph_storage: "NetworkXStorage"
+  vector_storage: "NanoVectorDBStorage"
+  kv_storage: "JsonKVStorage"
+  doc_status_storage: "JsonDocStatusStorage"
+  # Embeddings: sentence-transformers (local, default) | openai | ollama | hashing (tests)
+  embedding_provider: "sentence-transformers"
+  embedding_model: "all-MiniLM-L6-v2"
+  # LLM for answers / keyword extraction / entity extraction: auto | anthropic | openai | ollama | none
+  llm_provider: "auto"
+  llm_model: null               # defaults to MODEL_NAME
+  # Chunking (tokens of the active tokenizer; "bytes" tokenizer works offline)
+  chunk_token_size: 1200
+  chunk_overlap_token_size: 100
+  tokenizer: "tiktoken"
+  # LLM-based entity/relation extraction of business concepts (costs tokens)
+  extract_entities: false
+  max_extract_files: 0          # 0 = all files
+  # Retrieval defaults
+  default_query_mode: "mix"     # local | global | hybrid | naive | mix
+  top_k: 40
+  chunk_top_k: 20
+  # Wiki export (Obsidian-compatible Markdown), null = off
+  wiki_dir: null
+  max_graph_nodes: 5000
+
 # MCP Server Configuration
 # MCP (Model Context Protocol) servers expose tools for AI agents
 mcp_servers:
@@ -122,6 +161,21 @@ mcp_servers:
       - detect_cycles
       - get_graph_metrics
       - clear_graph
+
+  knowledge-base:
+    enabled: true
+    command: "python"
+    args:
+      - "src/mcp_servers/knowledge_base/knowledge_mcp_server.py"
+    description: "GraphRAG knowledge base of the analyzed system (LightRAG)"
+    tools:
+      - kb_query
+      - kb_retrieve
+      - kb_context
+      - kb_graph
+      - kb_stats
+      - kb_add_documents
+      - kb_export_wiki
 
 # Performance Optimization
 performance:

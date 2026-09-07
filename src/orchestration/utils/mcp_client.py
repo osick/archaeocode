@@ -143,6 +143,22 @@ class MCPClient:
                 "get_graph_metrics": get_graph_metrics,
                 "clear_graph": clear_graph
             }
+        elif self.config.name == "knowledge-base":
+            from src.mcp_servers.knowledge_base.knowledge_mcp_server import (
+                kb_query, kb_retrieve, kb_context, kb_graph, kb_stats,
+                kb_add_documents, kb_export_wiki
+            )
+
+            tool_map = {
+                "kb_query": kb_query,
+                "kb_retrieve": kb_retrieve,
+                "kb_context": kb_context,
+                "kb_graph": kb_graph,
+                "kb_stats": kb_stats,
+                "kb_add_documents": kb_add_documents,
+                "kb_export_wiki": kb_export_wiki
+            }
+
         else:
             raise ValueError(f"Unknown MCP server: {self.config.name}")
 

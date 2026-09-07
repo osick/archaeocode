@@ -60,6 +60,15 @@ echo "LANGSMITH_PROJECT=archaeocode" >> .env
 ```
 Then view traces at https://smith.langchain.com. Details: [docs/LANGSMITH_SETUP.md](docs/LANGSMITH_SETUP.md)
 
+**Knowledge base** — keep what a run learned and ask questions about it:
+
+```bash
+python archaeo --source sample_data/cobol --source-lang cobol --knowledge-base --kb-wiki ./wiki
+archaeo-kb retrieve "PAYMENT" --mode local     # works without an API key
+archaeo-kb query "Which programs touch the customer file?"   # needs an LLM key
+```
+Local files by default; Neo4j/Postgres/Qdrant for large systems. Details: [docs/KNOWLEDGE_MANAGEMENT.md](docs/KNOWLEDGE_MANAGEMENT.md)
+
 **Smalltalk grammars** — required before analyzing Smalltalk code:
 
 ```bash
@@ -76,4 +85,5 @@ python scripts/build_smalltalk_grammar.py
 
 - [README](README.md) — feature overview and Python API
 - [examples/user_story_extraction/basic_usage.py](examples/user_story_extraction/basic_usage.py) — programmatic usage
+- [examples/knowledge_base/query_knowledge_base.py](examples/knowledge_base/query_knowledge_base.py) — build and query the knowledge base
 - [docs/ROADMAP.md](docs/ROADMAP.md) — where the project is heading
