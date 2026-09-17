@@ -1,0 +1,54 @@
+name: Release
+
+# Cuts a GitHub release (and its tag) from a chosen commit.
+# Run it from the Actions tab or via the API with:
+#   version: "0.4.0"           -> tag v0.4.0, must match pyproject.toml
+#   title:   "The Site Archive" (optional codename appended to the release name)
+#   target:  "main"            (branch or commit SHA the tag points at)
+# Release notes are read from docs/releases/v<version>.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 0.4.0)"
+        required: true
+      title:
+        description: "Optional codename, e.g. The Site Archive"
+        required: false
+        default: ""
+      target:
+        description: "Branch or commit SHA to tag"
+        required: false
+        default: "main"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target }}
+          fetch-depth: 0
+
+      - name: Check that pyproject.toml carries the version
+        run: |
+          grep -q "^version = \"${{ inputs.version }}\"" pyproject.toml \
+            || { echo "pyproject.toml does not declare version ${{ inputs.version }}"; exit 1; }
+          test -f "docs/releases/v${{ inputs.version }}.md" \
+            || { echo "docs/releases/v${{ inputs.version }}.md is missing"; exit 1; }
+
+      - name: Create tag and GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          name="archaeocode v${{ inputs.version }}"
+          if [ -n "${{ inputs.title }}" ]; then name="$name — ${{ inputs.title }}"; fi
+          gh release create "v${{ inputs.version }}" \
+            --repo "${{ github.repository }}" \
+            --target "$(git rev-parse HEAD)" \
+            --title "$name" \
+            --notes-file "docs/releases/v${{ inputs.version }}.md"
