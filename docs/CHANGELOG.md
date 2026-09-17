@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.4.0] - 2026-09-07 — "The Site Archive"
+## [0.4.0] - 2026-09-17 — "The Site Archive"
 
 Until now every dig ended with a JSON report and amnesia. This release gives archaeocode a memory.
 
