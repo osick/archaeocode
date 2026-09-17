@@ -15,6 +15,7 @@ from src.orchestration.nodes.discovery_node import CodeDiscoveryNode
 from src.orchestration.nodes.ast_node import ASTAnalysisNode
 from src.orchestration.nodes.dependency_node import DependencyMappingNode
 from src.orchestration.nodes.user_story_node import UserStoryExtractionNode
+from src.orchestration.nodes.knowledge_node import KnowledgeBaseNode
 
 
 def _setup_langsmith_tracing():
@@ -63,7 +64,11 @@ class ReverseMigrationGraph:
     Main orchestrator for the reverse engineering workflow.
 
     Graph structure:
-    START -> Discovery -> AST Analysis -> Dependency Mapping -> User Story Extraction -> END
+    START -> Discovery -> AST Analysis -> Dependency Mapping -> User Story Extraction
+          -> [Knowledge Base] -> END
+
+    The knowledge-base step is opt-in (``config["knowledge_base"]["enabled"]``)
+    and persists the run's findings into a LightRAG-backed GraphRAG store.
     """
 
     def __init__(self, config: Dict[str, Any]):
@@ -81,6 +86,7 @@ class ReverseMigrationGraph:
         ast_node = ASTAnalysisNode(self.config)
         dependency_node = DependencyMappingNode(self.config)
         user_story_node = UserStoryExtractionNode(self.config)
+        knowledge_node = KnowledgeBaseNode(self.config)
 
         # Create state graph
         workflow = StateGraph(MigrationState)
@@ -96,7 +102,13 @@ class ReverseMigrationGraph:
         workflow.add_edge("discovery", "ast_analysis")
         workflow.add_edge("ast_analysis", "dependency_mapping")
         workflow.add_edge("dependency_mapping", "user_story_extraction")
-        workflow.add_edge("user_story_extraction", END)
+
+        if knowledge_node.enabled:
+            workflow.add_node("knowledge_base", knowledge_node)
+            workflow.add_edge("user_story_extraction", "knowledge_base")
+            workflow.add_edge("knowledge_base", END)
+        else:
+            workflow.add_edge("user_story_extraction", END)
 
         # Add conditional edges based on state
         # workflow.add_conditional_edges(

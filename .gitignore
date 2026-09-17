@@ -51,6 +51,8 @@ data/graph_db/*
 !data/graph_db/.gitkeep
 data/metadata/*
 !data/metadata/.gitkeep
+data/knowledge_base/*
+!data/knowledge_base/.gitkeep
 
 # Logs
 *.log

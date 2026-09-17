@@ -7,6 +7,7 @@ Entry point for running the archaeocode analysis workflow.
 Usage:
     archaeo --source ./sample_data --source-lang cobol --target-lang java
     archaeo --source ./legacy_code --source-lang smalltalk --target-lang kotlin
+    archaeo --source ./legacy_code --source-lang cobol --knowledge-base --kb-wiki ./wiki
 """
 
 import argparse
@@ -79,6 +80,41 @@ def parse_args():
         help="Generate workflow graph visualization"
     )
 
+    kb = parser.add_argument_group(
+        "knowledge base",
+        "Persist the run into a queryable knowledge base (LightRAG GraphRAG). "
+        "Query it afterwards with `archaeo-kb` or the knowledge-base MCP server."
+    )
+    kb.add_argument(
+        "--knowledge-base",
+        "--kb",
+        action="store_true",
+        help="Index files, entities, dependencies and user stories into the knowledge base"
+    )
+    kb.add_argument(
+        "--kb-dir",
+        help="Knowledge base directory (default: $KB_WORKING_DIR or data/knowledge_base)"
+    )
+    kb.add_argument(
+        "--kb-workspace",
+        help="Workspace name inside shared back-ends such as Neo4j (default: $KB_WORKSPACE)"
+    )
+    kb.add_argument(
+        "--kb-extract",
+        action="store_true",
+        help="Also run LLM entity/relation extraction over the sources (needs an API key, costs tokens)"
+    )
+    kb.add_argument(
+        "--kb-wiki",
+        metavar="DIR",
+        help="Export the knowledge graph as an Obsidian-compatible Markdown wiki into DIR"
+    )
+    kb.add_argument(
+        "--kb-embeddings",
+        choices=["sentence-transformers", "openai", "ollama", "hashing"],
+        help="Embedding provider (default: $KB_EMBEDDING_PROVIDER or sentence-transformers)"
+    )
+
     return parser.parse_args()
 
 
@@ -113,6 +149,10 @@ def save_report(state: dict, report_path: str):
     # Add user stories
     report["user_stories"] = state.get("user_stories", [])
     report["statistics"]["user_stories_generated"] = len(state.get("user_stories", []))
+
+    # Knowledge base (only present when --knowledge-base was used)
+    if state.get("knowledge_base"):
+        report["knowledge_base"] = state["knowledge_base"]
 
     # Save to file
     with open(report_path, 'w') as f:
@@ -166,6 +206,15 @@ def print_summary(state: dict):
         if len(user_stories) > 3:
             print(f"   ... and {len(user_stories) - 3} more")
 
+    kb = state.get("knowledge_base")
+    if kb:
+        print(f"\n🧠 Knowledge Base: {kb.get('working_dir')}")
+        print(f"   Entities: {kb.get('entities')} | Relations: {kb.get('relationships')} | Chunks: {kb.get('chunks')}")
+        print(f"   Storage:  {kb.get('graph_storage')} / {kb.get('vector_storage')} | LLM extraction: {kb.get('extraction')}")
+        if kb.get("wiki"):
+            print(f"   Wiki:     {kb['wiki'].get('output_dir')} ({kb['wiki'].get('pages')} pages)")
+        print(f"   Query it: archaeo-kb --dir {kb.get('working_dir')} query \"<question>\"")
+
     print("\n" + "="*70 + "\n")
 
 
@@ -185,6 +234,18 @@ def main():
         "hitl": {"enabled": False},  # Disable for now
         "verbose": args.verbose
     }
+
+    if args.knowledge_base:
+        kb_config = {"enabled": True, "extract_entities": bool(args.kb_extract)}
+        if args.kb_dir:
+            kb_config["working_dir"] = args.kb_dir
+        if args.kb_workspace:
+            kb_config["workspace"] = args.kb_workspace
+        if args.kb_wiki:
+            kb_config["wiki_dir"] = args.kb_wiki
+        if args.kb_embeddings:
+            kb_config["embedding_provider"] = args.kb_embeddings
+        config["knowledge_base"] = kb_config
 
     try:
         # Create graph

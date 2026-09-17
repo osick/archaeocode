@@ -34,6 +34,7 @@ from .nodes.discovery_node import discovery_node
 from .nodes.ast_node_mcp import ast_analysis_node_mcp
 from .nodes.dependency_node_mcp import dependency_mapping_node_mcp
 from .nodes.user_story_node import user_story_extraction_node
+from .nodes.knowledge_node import KnowledgeBaseNode
 from .utils.mcp_client import configure_mcp_manager, initialize_mcp_servers, shutdown_mcp_servers
 from .utils.tracing import is_tracing_enabled, create_run_metadata
 
@@ -147,7 +148,14 @@ class ReverseEngineeringWorkflowMCP:
         workflow.add_edge("discovery", "ast_analysis")
         workflow.add_edge("ast_analysis", "dependency_mapping")
         workflow.add_edge("dependency_mapping", "user_story_extraction")
-        workflow.add_edge("user_story_extraction", END)
+
+        knowledge_node = KnowledgeBaseNode(self.config)
+        if knowledge_node.enabled:
+            workflow.add_node("knowledge_base", knowledge_node)
+            workflow.add_edge("user_story_extraction", "knowledge_base")
+            workflow.add_edge("knowledge_base", END)
+        else:
+            workflow.add_edge("user_story_extraction", END)
 
         # Compile graph
         self.graph = workflow.compile(checkpointer=self.checkpointer)

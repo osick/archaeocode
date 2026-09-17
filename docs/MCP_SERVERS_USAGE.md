@@ -4,11 +4,12 @@ This document explains how to use the MCP (Model Context Protocol) servers imple
 
 ## Overview
 
-The project implements **three MCP servers** using the official [Anthropic MCP SDK](https://github.com/anthropics/mcp):
+The project implements **four MCP servers** using the official [Anthropic MCP SDK](https://github.com/anthropics/mcp):
 
 1. **AST Analysis Server** - Code parsing and static analysis using tree-sitter
 2. **RAG Pipeline Server** - Code chunking, embeddings, and semantic search
 3. **Neo4j Graph Database Server** - Dependency graph operations
+4. **Knowledge Base Server** - GraphRAG knowledge base of an analyzed system (LightRAG)
 
 All servers follow the official MCP protocol and can be used standalone or integrated with Claude Desktop, IDEs, or custom applications.
 
@@ -548,6 +549,71 @@ Clear all nodes and relationships from the graph database.
 ```bash
 # Run the server
 python src/mcp_servers/graph_db/neo4j_mcp_server.py
+```
+
+---
+
+## 4. Knowledge Base MCP Server
+
+**Location:** `src/mcp_servers/knowledge_base/knowledge_mcp_server.py`
+
+The site archive, opened to agents. Exposes the knowledge base that
+`archaeo --knowledge-base` builds (see [KNOWLEDGE_MANAGEMENT.md](KNOWLEDGE_MANAGEMENT.md)),
+so an agent planning a migration can ask what the last dig found instead of
+re-reading the code. Backed by
+[LightRAG](https://github.com/HKUDS/LightRAG): knowledge graph + vector indexes,
+file-based by default, Neo4j/Postgres/Qdrant/... via `KB_*` environment variables.
+
+All tools accept optional `working_dir` (default `$KB_WORKING_DIR` or
+`data/knowledge_base`) and `workspace` (default `$KB_WORKSPACE`) arguments and
+return `{"success": true, ...}` or `{"success": false, "error": "..."}`.
+
+### Available Tools
+
+#### `kb_query`
+Natural-language question → LLM-synthesized answer with citations. Needs an LLM
+(Anthropic / OpenAI / Ollama, picked from the keys present).
+
+**Parameters:** `question` (required), `mode` (`local` | `global` | `hybrid` | `naive` | `mix`), `response_type`
+
+#### `kb_retrieve`
+Structured retrieval without an LLM: matching entities, relationships, chunks and references.
+
+**Parameters:** `question` (required), `mode`, `top_k`, `chunk_top_k`
+
+**Returns:**
+```json
+{
+  "success": true,
+  "question": "PROCESS-PAYMENT",
+  "mode": "local",
+  "entities": [{"entity_name": "PAYMENT.cob::PROCESS-PAYMENT", "entity_type": "function", "description": "...", "file_path": "PAYMENT.cob"}],
+  "relationships": [{"src_id": "PAYMENT.cob", "tgt_id": "PAYMENT.cob::PROCESS-PAYMENT", "keywords": "contains", "description": "..."}],
+  "chunks": [{"file_path": "PAYMENT.cob", "content": "File: PAYMENT.cob (lines 1-36, cobol)\n..."}],
+  "references": [],
+  "metadata": {"query_mode": "local", "keywords": {"high_level": [], "low_level": ["PROCESS-PAYMENT"]}}
+}
+```
+
+#### `kb_context`
+The prompt-ready context block LightRAG would hand to an LLM — for agents that reason over the evidence themselves.
+
+#### `kb_graph`
+Neighbourhood of an entity (`label`, `max_depth`, `max_nodes`); `label="*"` returns the whole (capped) graph.
+
+#### `kb_stats`
+Entity count, entity-type breakdown, document processing status, and the active storage / embedding / LLM configuration.
+
+#### `kb_add_documents`
+Ingest additional documents (`documents: [{"path", "content"}]`, optional `extract` for LLM entity extraction).
+
+#### `kb_export_wiki`
+Write an Obsidian-compatible Markdown wiki (`output_dir`, optional `max_nodes`).
+
+### Running the Knowledge Base Server
+
+```bash
+KB_WORKING_DIR=data/knowledge_base python src/mcp_servers/knowledge_base/knowledge_mcp_server.py
 ```
 
 ---

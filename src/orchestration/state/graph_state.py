@@ -102,6 +102,9 @@ class MigrationState(TypedDict):
     # User stories
     user_stories: List[Dict[str, Any]]
 
+    # Knowledge base (LightRAG-backed GraphRAG): indexing statistics + location
+    knowledge_base: Dict[str, Any]
+
     # Human-in-the-loop
     pending_approvals: List[Dict[str, Any]]
     human_feedback: List[Dict[str, Any]]
@@ -175,6 +178,7 @@ def create_initial_state(
         generated_artifacts=[],
         migration_plan=None,
         user_stories=[],
+        knowledge_base={},
         pending_approvals=[],
         human_feedback=[],
         errors=[],

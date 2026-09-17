@@ -58,7 +58,7 @@ result = mcp_client.call_tool("parse_file", {
 
 ## 🏗️ Our MCP Architecture
 
-We're implementing **3 MCP servers** for our reverse engineering system:
+We're implementing **3 analysis MCP servers** for our reverse engineering system, plus a fourth, the **knowledge base server** (GraphRAG via LightRAG) that persists what the analysis found — see [KNOWLEDGE_MANAGEMENT.md](KNOWLEDGE_MANAGEMENT.md) and [MCP_SERVERS_USAGE.md](MCP_SERVERS_USAGE.md#4-knowledge-base-mcp-server):
 
 ```
 ┌──────────────────────────────────────────────────────────────┐

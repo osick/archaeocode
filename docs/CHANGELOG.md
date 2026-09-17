@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.0] - 2026-09-07 — "The Site Archive"
+
+Until now every dig ended with a JSON report and amnesia. This release gives archaeocode a memory.
+
+### Added
+- **Knowledge management**: a persistent, queryable knowledge base built on [LightRAG](https://github.com/HKUDS/LightRAG) (GraphRAG: knowledge graph + vector retrieval). See [docs/KNOWLEDGE_MANAGEMENT.md](KNOWLEDGE_MANAGEMENT.md) for the decision record.
+  - New workflow node `knowledge_base` (opt-in via `--knowledge-base` / `knowledge_base.enabled`) that writes files, AST entities, dependency edges (incl. circular-dependency markers) and user stories into the graph **without any LLM call**; `--kb-extract` adds LLM extraction of business entities.
+  - New MCP server `src/mcp_servers/knowledge_base/knowledge_mcp_server.py` with `kb_query`, `kb_retrieve`, `kb_context`, `kb_graph`, `kb_stats`, `kb_add_documents`, `kb_export_wiki`; registered in `config/langgraph_config.yaml` and the in-process MCP client.
+  - New CLI `archaeo-kb` (`query`, `retrieve`, `context`, `graph`, `stats`, `add`, `wiki`).
+  - Obsidian-compatible Markdown wiki export (`--kb-wiki DIR`, `archaeo-kb wiki`).
+  - Storage back-ends selectable by configuration: NetworkX / Neo4j / Postgres+AGE / Memgraph (graph), nano-vectordb / FAISS / pgvector / Qdrant / Milvus (vectors), JSON / Postgres / Redis / Mongo (KV); workspaces isolate several systems in one back-end. Embeddings via sentence-transformers (default, local), OpenAI, Ollama; LLM via Anthropic, OpenAI, Ollama.
+  - Offline mode (`KB_TOKENIZER=bytes`, `KB_EMBEDDING_PROVIDER=hashing`) used by the new test module `tests/test_knowledge_base.py`.
+  - Example `examples/knowledge_base/query_knowledge_base.py`; new `knowledge_base` state field and report section.
+
+### Changed
+- AST entities now carry `file_path`, so classes/functions/methods can be linked to their file.
+- `requirements.txt` adds `lightrag-hku`.
+
 ## [0.3.0] - 2026-08-27
 
 First public release, under the new name **archaeocode** (previously `agentic-reverse-engineering`).

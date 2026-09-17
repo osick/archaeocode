@@ -65,6 +65,31 @@ rag_pipeline:
     separators: ["\n\n", "\n", " ", ""]
     function_boundary_aware: true
 
+# Knowledge Base Configuration (LightRAG GraphRAG)
+# The MCP server reads KB_* environment variables (see .env.example); these
+# profiles document the recommended back-end combinations per scale.
+knowledge_base:
+  profiles:
+    laptop:        # one developer, up to ~100k LOC, zero infrastructure
+      graph_storage: "NetworkXStorage"
+      vector_storage: "NanoVectorDBStorage"
+      kv_storage: "JsonKVStorage"
+      embedding_provider: "sentence-transformers"
+    team:          # shared Neo4j + Postgres, millions of LOC, several analysts
+      graph_storage: "Neo4JStorage"
+      vector_storage: "PGVectorStorage"
+      kv_storage: "PGKVStorage"
+      doc_status_storage: "PGDocStatusStorage"
+      embedding_provider: "openai"
+      embedding_model: "text-embedding-3-large"
+    enterprise:    # dedicated vector cluster, Redis KV, many systems (one workspace each)
+      graph_storage: "Neo4JStorage"
+      vector_storage: "QdrantVectorDBStorage"   # or MilvusVectorDBStorage
+      kv_storage: "RedisKVStorage"
+      doc_status_storage: "RedisDocStatusStorage"
+      embedding_provider: "openai"
+      embedding_model: "text-embedding-3-large"
+
 # Graph Database Configuration
 graph_db:
   provider: "neo4j"  # Options: "neo4j", "memgraph"

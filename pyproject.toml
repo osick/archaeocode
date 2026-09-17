@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "archaeocode"
-version = "0.3.0"
+version = "0.4.0"
 description = "Automated software archaeology: excavate user stories, dependency maps, and structure from legacy code with LangGraph + MCP agents"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Oliver Sick" }]
-keywords = ["reverse-engineering", "legacy-code", "langgraph", "mcp", "tree-sitter", "cobol", "smalltalk", "migration"]
+keywords = ["reverse-engineering", "legacy-code", "langgraph", "mcp", "tree-sitter", "cobol", "smalltalk", "migration", "graphrag", "knowledge-graph"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -26,6 +26,7 @@ dynamic = ["dependencies"]
 
 [project.scripts]
 archaeo = "src.orchestration.cli:main"
+archaeo-kb = "src.orchestration.kb_cli:main"
 
 [project.urls]
 Homepage = "https://github.com/osick/archaeocode"

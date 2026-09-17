@@ -463,6 +463,8 @@ class ASTAnalysisNode:
                         # Extract entities
                         entities = self.extract_entities(ast, artifact["language"])
                         for entity_type, entity_list in entities.items():
+                            for entity in entity_list:
+                                entity.setdefault("file_path", artifact["path"])
                             parsed_entities[entity_type].extend(entity_list)
 
                         # Calculate complexity
