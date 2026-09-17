@@ -1,24 +1,27 @@
 name: Release
 
-# Cuts a GitHub release (and its tag) from a chosen commit.
-# Run it from the Actions tab or via the API with:
-#   version: "0.4.0"           -> tag v0.4.0, must match pyproject.toml
-#   title:   "The Site Archive" (optional codename appended to the release name)
-#   target:  "main"            (branch or commit SHA the tag points at)
-# Release notes are read from docs/releases/v<version>.md.
+# Cuts a GitHub release (and its tag) for the version declared in pyproject.toml.
+#
+# Runs on every push to main that touches the version, the release notes, or
+# this workflow. It is idempotent: if tag v<version> already exists nothing
+# happens, so bumping the version and adding docs/releases/v<version>.md in
+# one pull request is all it takes to release. It can also be run by hand
+# from the Actions tab (workflow_dispatch) against any branch or commit.
+#
+# Release notes come from docs/releases/v<version>.md; its first line must be
+# a level-1 heading, which becomes the release title.
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - pyproject.toml
+      - docs/releases/**
+      - .github/workflows/release.yml
   workflow_dispatch:
     inputs:
-      version:
-        description: "Version to release (e.g. 0.4.0)"
-        required: true
-      title:
-        description: "Optional codename, e.g. The Site Archive"
-        required: false
-        default: ""
       target:
-        description: "Branch or commit SHA to tag"
+        description: "Branch or commit SHA to release from"
         required: false
         default: "main"
 
@@ -31,24 +34,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.target }}
+          ref: ${{ inputs.target || github.sha }}
           fetch-depth: 0
 
-      - name: Check that pyproject.toml carries the version
+      - name: Read version and release notes
+        id: meta
         run: |
-          grep -q "^version = \"${{ inputs.version }}\"" pyproject.toml \
-            || { echo "pyproject.toml does not declare version ${{ inputs.version }}"; exit 1; }
-          test -f "docs/releases/v${{ inputs.version }}.md" \
-            || { echo "docs/releases/v${{ inputs.version }}.md is missing"; exit 1; }
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml | head -1)
+          test -n "$version" || { echo "no version in pyproject.toml"; exit 1; }
+          notes="docs/releases/v${version}.md"
+          if [ ! -f "$notes" ]; then
+            echo "::notice::$notes is missing, not releasing v$version"
+            echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v${version}" >/dev/null 2>&1; then
+            echo "::notice::tag v$version already exists, nothing to do"
+            echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          title=$(sed -n '1s/^# *//p' "$notes")
+          test -n "$title" || { echo "$notes must start with a level-1 heading"; exit 1; }
+          tail -n +2 "$notes" | sed '1{/^$/d}' > /tmp/release_body.md
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "title=$title" >> "$GITHUB_OUTPUT"
 
       - name: Create tag and GitHub release
+        if: steps.meta.outputs.skip == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          name="archaeocode v${{ inputs.version }}"
-          if [ -n "${{ inputs.title }}" ]; then name="$name — ${{ inputs.title }}"; fi
-          gh release create "v${{ inputs.version }}" \
+          gh release create "v${{ steps.meta.outputs.version }}" \
             --repo "${{ github.repository }}" \
             --target "$(git rev-parse HEAD)" \
-            --title "$name" \
-            --notes-file "docs/releases/v${{ inputs.version }}.md"
+            --title "${{ steps.meta.outputs.title }}" \
+            --notes-file /tmp/release_body.md
