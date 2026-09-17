@@ -1,6 +1,8 @@
 # Changelog
 
-## [0.4.0] - 2026-09-07
+## [0.4.0] - 2026-09-07 — "The Site Archive"
+
+Until now every dig ended with a JSON report and amnesia. This release gives archaeocode a memory.
 
 ### Added
 - **Knowledge management**: a persistent, queryable knowledge base built on [LightRAG](https://github.com/HKUDS/LightRAG) (GraphRAG: knowledge graph + vector retrieval). See [docs/KNOWLEDGE_MANAGEMENT.md](KNOWLEDGE_MANAGEMENT.md) for the decision record.

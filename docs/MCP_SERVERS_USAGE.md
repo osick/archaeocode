@@ -557,8 +557,10 @@ python src/mcp_servers/graph_db/neo4j_mcp_server.py
 
 **Location:** `src/mcp_servers/knowledge_base/knowledge_mcp_server.py`
 
-Exposes the knowledge base that `archaeo --knowledge-base` builds (see
-[KNOWLEDGE_MANAGEMENT.md](KNOWLEDGE_MANAGEMENT.md)). Backed by
+The site archive, opened to agents. Exposes the knowledge base that
+`archaeo --knowledge-base` builds (see [KNOWLEDGE_MANAGEMENT.md](KNOWLEDGE_MANAGEMENT.md)),
+so an agent planning a migration can ask what the last dig found instead of
+re-reading the code. Backed by
 [LightRAG](https://github.com/HKUDS/LightRAG): knowledge graph + vector indexes,
 file-based by default, Neo4j/Postgres/Qdrant/... via `KB_*` environment variables.
 
